@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="replyMapper">
+	<select id="readReply" resultType="com.mycompany.vo.ReplyVO">
+	SELECT CRSEQ, CONTENT, WRITER, REGDATE FROM COMMUNITY_REPLY WHERE COSEQ = #{coseq}
+	</select>
+	<insert id="writeReply">
+	INSERT INTO COMMUNITY_REPLY(COSEQ, CRSEQ, CONTENT, WRITER) VALUES( #{coseq}, COMMUNITY_REPLY_SEQ.NEXTVAL, #{content}, #{writer})
+	</insert>
+	<update id="updateReply" parameterType="com.mycompany.vo.ReplyVO">
+	UPDATE COMMUNITY_REPLY SET CONTENT = #{content} WHERE CRSEQ = #{crseq}
+	</update>
+	<delete id="deleteReply" parameterType="com.mycompany.vo.ReplyVO">
+	DELETE FROM COMMUNITY_REPLY WHERE CRSEQ = #{crseq}
+	</delete>
+	<select id="selectReply" resultType="com.mycompany.vo.ReplyVO">
+	SELECT COSEQ, CRSEQ, CONTENT, WRITER, REGDATE FROM COMMUNITY_REPLY WHERE CRSEQ = #{crseq}
+	</select>
+</mapper>

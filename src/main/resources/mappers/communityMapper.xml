@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="communityMapper">
+	<insert id="insert" parameterType="com.mycompany.vo.CommunityVO" useGeneratedKeys="true" keyProperty="coseq">
+	<selectKey keyProperty="coseq" resultType="int" order="BEFORE">
+	SELECT COMMUNITY_SEQ.NEXTVAL FROM DUAL
+	</selectKey>
+	INSERT INTO COMMUNITY (COSEQ, LEADER, CATEGORY, PLACE, INTRO) VALUES(#{coseq}, #{leader}, #{category}, #{place}, #{intro})
+	</insert>
+	<select id="list" resultType="com.mycompany.vo.CommunityVO">
+	SELECT COSEQ, LEADER, CATEGORY, REGDATE FROM COMMUNITY ORDER BY COSEQ DESC
+	</select>
+	<select id="read" parameterType="int" resultType="com.mycompany.vo.CommunityVO">
+	SELECT COSEQ, LEADER, CATEGORY, PLACE, INTRO, REGDATE FROM COMMUNITY WHERE COSEQ = #{coseq}
+	</select>
+	<update id="update" parameterType="com.mycompany.vo.CommunityVO">
+	UPDATE COMMUNITY SET CATEGORY = #{category}, PLACE = #{place}, INTRO = #{intro} WHERE COSEQ = #{coseq}
+	</update>
+	<delete id="delete" parameterType="int">
+	DELETE FROM COMMUNITY WHERE COSEQ = #{coseq}
+	</delete>
+	<select id="listPage" resultType="com.mycompany.vo.CommunityVO" parameterType="com.mycompany.vo.SearchCriteria">
+	SELECT COSEQ, LEADER, CATEGORY, PLACE, INTRO, REGDATE FROM (SELECT COSEQ, LEADER, CATEGORY, PLACE, INTRO, REGDATE, ROW_NUMBER() OVER(ORDER BY COSEQ DESC) AS RNUM FROM COMMUNITY WHERE 1=1 <include refid="search"></include>) MP WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd} ORDER BY COSEQ DESC
+	</select>
+	<select id="listCount" parameterType="com.mycompany.vo.SearchCriteria" resultType="int">
+	SELECT COUNT(COSEQ) FROM COMMUNITY WHERE 1=1 <include refid="search"/>AND COSEQ > 0
+	</select>
+	<insert id="insertFile" parameterType="hashMap">
+	INSERT INTO COMMUNITY_FILE(FILE_NO, COSEQ, ORG_FILE_NAME, STORED_FILE_NAME, FILE_SIZE) VALUES(COMMUNITY_FILE_SEQ.NEXTVAL, #{COSEQ}, #{ORG_FILE_NAME}, #{STORED_FILE_NAME}, #{FILE_SIZE})
+	</insert>
+	<select id="selectFileList" parameterType="int" resultType="hashMap">
+	SELECT FILE_NO, ORG_FILE_NAME, ROUND(FILE_SIZE/1024,1) AS FILE_SIZE FROM COMMUNITY_FILE WHERE COSEQ = #{COSEQ} AND DEL_GB = 'N'
+	</select>
+	<select id="selectFileInfo" parameterType="hashMap" resultType="hashMap">
+	SELECT STORED_FILE_NAME, ORG_FILE_NAME FROM COMMUNITY_FILE WHERE FILE_NO = #{FILE_NO} AND DEL_GB = 'N' ORDER BY FILE_NO ASC
+	</select>
+	<update id="updateFile" parameterType="hashMap">
+	UPDATE COMMUNITY_FILE SET DEL_GB = 'Y' WHERE FILE_NO = #{FILE_NO}
+	</update>
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 'c'.toString()">AND CATEGORY LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'i'.toString()">AND INTRO LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'l'.toString()">AND LEADER LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'ci'.toString()">AND (CATEGORY LIKE '%' || #{keyword} || '%') or (INTRO LIKE '%' || #{keyword} || '%')</if>
+		</if>
+	</sql>
+</mapper>

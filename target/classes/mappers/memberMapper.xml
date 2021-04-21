@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberMapper">
+	<insert id="register">
+	INSERT INTO MEMBER(MSEQ, ID, NICK, PW, EMAIL, GENDER, AGE) VALUES(MEMBER_SEQ.NEXTVAL, #{id}, #{nick}, #{pw}, #{email}, #{gender}, #{age})
+    </insert>
+    <select id="login" resultType="com.mycompany.vo.MemberVO">
+	SELECT ID, PW, EMAIL FROM MEMBER WHERE ID = #{id} AND PW = #{pw}   
+	</select>
+	<update id="memberUpdate">
+	UPDATE MEMBER SET NICK = #{nick}, PW = #{pw}, EMAIL = #{email}, GENDER = #{gender}, AGE = #{age} WHERE ID = #{id}
+	</update>
+	<delete id="memberDelete">
+	DELETE FROM MEMBER WHERE ID = #{id} AND PW = #{pw} 
+	</delete>
+	<select id="passChk" resultType="int">
+	SELECT COUNT(*) FROM MEMBER WHERE ID = #{id} AND PW = #{pw}
+	</select>
+	<select id="idChk" resultType="int">
+	SELECT COUNT(*) FROM MEMBER WHERE ID = #{id}
+	</select>
+	<select id="nickChk" resultType="int">
+	SELECT COUNT(*) FROM MEMBER WHERE NICK = #{nick}
+	</select>
+</mapper>
